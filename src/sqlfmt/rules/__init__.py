@@ -24,6 +24,27 @@ from sqlfmt.tokens import TokenType
 MAIN = [
     *CORE,
     Rule(
+        # BigQuery pipe syntax. Lex |> together with the pipe operator
+        # that follows it, so that "|> where" stays on one line. A bare
+        # |> keeps unknown pipe operators intact. The lookahead protects
+        # the pg operator |>>
+        # see https://github.com/tconbeer/sqlfmt/issues/672
+        name="pipe_operator",
+        priority=780,  # angle_bracket_close is 790, operator is 800
+        pattern=group(
+            r"\|>(?!>)\s*("
+            r"select(\s+(all|distinct))?"
+            r"|extend|set|drop|rename|as|where|limit|aggregate|distinct"
+            r"|order\s+by|call|window|tablesample|with|pivot|unpivot"
+            r"|match_recognize"
+            r"|(union|intersect|except)(\s+(all|distinct))?"
+            r"|((inner|left|right|full|cross)\s+)?(outer\s+)?join"
+            r")(?=\W|$)",
+            r"\|>(?!>)",
+        ),
+        action=partial(actions.add_node_to_buffer, token_type=TokenType.UNTERM_KEYWORD),
+    ),
+    Rule(
         name="star_columns",
         priority=409,  # star is 410
         pattern=group(r"\*columns") + group(r"\(", r"$"),

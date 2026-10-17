@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Formatting Changes and Bug Fixes
+
+- sqlfmt now supports BigQuery pipe syntax. It no longer splits the pipe operator `|>` into `| >`, and it keeps each pipe operator on the same line as the keyword that follows it, like `|> where` ([#672](https://github.com/tconbeer/sqlfmt/issues/672)).
+
 ## [0.32.0] - 2026-08-10
 
 ### Formatting Changes and Bug Fixes
